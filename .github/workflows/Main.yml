@@ -3,17 +3,16 @@ name: CI/CD Pipeline with Cypress
 on:
   pull_request:
     branches:
+      - feature
       - develop
-  push:
-    branches:
-      - main
-
+  
 jobs:
-  test:
+  test-runner:
     # Operating system to run job on
-    name: cypress-test
     runs-on: ubuntu-latest
-
+    strategy: 
+      matrix:
+        node-version: [ 18.x, 20.x, 22.x ]
     # Steps in job
     steps:
       # Get code from repo
@@ -23,11 +22,12 @@ jobs:
       - name: Use Node.js 21.x
         uses: actions/setup-node@v4
         with:
-          node-version: 21.x
+          node-version: ${{matrix.node-version}}
+          cache: "npm"
 
       # Install dependencies
       - name: 🧰 Install Deps
-        run: npm install
+        run: npm ci
         name: Run Cypress
         uses: Cypress-io/github-action@v6
       # Run build
